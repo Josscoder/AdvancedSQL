@@ -2,7 +2,7 @@
 
 namespace AdvancedSQL;
 
-use Exception;
+use AdvancedSQL\exception\SQLException;
 use PDO;
 use PDOException;
 
@@ -34,12 +34,12 @@ class MySQL extends SQL
      * @param string $username
      * @param string $password
      * @param string $database
-     * @throws Exception
+     * @throws SQLException
      */
     public function __construct(string $host = "127.0.0.1", int $port = 3306, string $username = "root", string $password = "", string $database = "testing")
     {
         if (!extension_loaded("pdo")) {
-            throw new Exception(0, "exception.database.pdo_required");
+            throw new SQLException('PDO extension is required');
         }
 
         self::$instance = $this;
@@ -55,7 +55,7 @@ class MySQL extends SQL
 
     /**
      * @return void
-     * @throws Exception
+     * @throws SQLException
      */
     public function run(): void
     {
@@ -83,8 +83,8 @@ class MySQL extends SQL
                     $temp->exec("CREATE DATABASE $this->database");
 
                     $temp = null;
-                } catch (PDOException $ex) {
-                    throw new Exception($ex->getCode(), "exception.database.connecting", $e->getMessage());
+                } catch (PDOException $exception) {
+                    throw new SQLException(sprintf('Error establishing a mysql connection: %s' , $exception->getMessage()));
                 }
 
                 $this->run();
@@ -92,7 +92,7 @@ class MySQL extends SQL
                 return;
             }
 
-            throw new Exception($e->getCode(), "exception.database.connecting", $e->getMessage());
+            throw new SQLException(sprintf('Error establishing a mysql connection: %s' , $e->getMessage()));
         }
     }
 
@@ -149,7 +149,7 @@ class MySQL extends SQL
      *
      * @param array $import
      * @return void
-     * @throws Exception
+     * @throws SQLException
      */
     public function import(array $import): void
     {
@@ -157,7 +157,7 @@ class MySQL extends SQL
             $table = $this->table($table);
 
             if (!$table->exists() && !$table->create()->columns($columns)->execute()) {
-                throw new Exception(1, "exception.database.create_table", $this->getLastError());
+                throw new SQLException(sprintf('Error trying to create a table: %s', $this->getLastError()));
             }
         }
     }
@@ -167,7 +167,7 @@ class MySQL extends SQL
      *
      * @param array $tables
      * @return void
-     * @throws Exception
+     * @throws SQLException
      */
     public function modify(array $tables): void
     {
@@ -175,7 +175,7 @@ class MySQL extends SQL
             $table = $this->table($table);
 
             if (!$table->exists()) {
-                throw new Exception(2, "exception.database.modify_column", $this->getLastError());
+                throw new SQLException(sprintf('Error trying to modify a column: %s', $this->getLastError()));
             }
 
             $columns = [];
@@ -188,7 +188,7 @@ class MySQL extends SQL
                 $execute = in_array($column, $columns) ? $table->addColumns()->column($column, $type) : $table->modifyColumns()->column($column, $type);
 
                 if (!$execute) {
-                    throw new Exception(2, "exception.database.modify_column", $this->getLastError());
+                    throw new SQLException(sprintf('Error trying to modify a column: %s', $this->getLastError()));
                 }
             }
         }
