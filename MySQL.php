@@ -59,7 +59,7 @@ class MySQL extends SQL
      */
     public function run(): void
     {
-        if (is_null($this->connection)) {
+        if (!is_null($this->connection)) {
             return;
         }
 
