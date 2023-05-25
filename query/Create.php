@@ -2,8 +2,6 @@
 
 namespace AdvancedSQL\query;
 
-use PDOStatement;
-
 /**
  * Create class
  */

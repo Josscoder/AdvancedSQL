@@ -2,8 +2,6 @@
 
 namespace AdvancedSQL\query;
 
-use PDOStatement;
-
 /**
  * Update class
  */ 
@@ -98,7 +96,7 @@ class Update extends Query
     }
 
     /**
-     * Set the column name and the value that you want to assign to the row bu array.
+     * Set the column name and the value that you want to assign to the row by array.
      *
      * @param array $fields
      * @return Update

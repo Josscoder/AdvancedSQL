@@ -16,7 +16,7 @@ class ShowColumns extends Query
     private ?string $like = null;
 
     /**
-     * Execute the Query and return an PDOStatement Object so you can fetch results.
+     * Execute the Query and return an PDOStatement Object, so you can fetch results.
      *
      * @return PDOStatement
      */

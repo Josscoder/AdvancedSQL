@@ -183,7 +183,7 @@ class Select extends Query{
     }
 
     /**
-     * Execute the Query and return an PDOStatement Object so you can fetch results.
+     * Execute the Query and return an PDOStatement Object, so you can fetch results.
      *
      * @return PDOStatement
      */
