@@ -1,28 +1,13 @@
 <?php
-/**
- * 
- * Advanced microFramework
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * 
- * @copyright Copyright (c) 2019 - 2020 Advanced microFramework
- * @author Advanced microFramework Team (Denzel Code, Soull Darknezz)
- * @link https://github.com/DenzelCode/Advanced
- * 
- */
 
-namespace advanced\sql\query;
+namespace AdvancedSQL\query;
 
-use advanced\sql\query\join\FullJoin;
-use advanced\sql\query\join\IJoin;
-use advanced\sql\query\join\InnerJoin;
-use advanced\sql\query\join\Join;
-use advanced\sql\query\join\LeftJoin;
-use advanced\sql\query\join\RightJoin;
+use AdvancedSQL\query\join\FullJoin;
+use AdvancedSQL\query\join\IJoin;
+use AdvancedSQL\query\join\InnerJoin;
+use AdvancedSQL\query\join\Join;
+use AdvancedSQL\query\join\LeftJoin;
+use AdvancedSQL\query\join\RightJoin;
 use PDOStatement;
 
 /**
@@ -33,27 +18,27 @@ class Select extends Query{
     /**
      * @var array
      */
-    private $columns = ["*"];
+    private array $columns = ["*"];
 
     /**
      * @var string|null
      */
-    private $distinct = null;
+    private ?string $distinct = null;
 
     /**
      * @var Join[]
      */
-    private $joins = [];
+    private array $joins = [];
 
     /**
      * @var ?string
      */
-    private $order = null;
+    private ?string $order = null;
 
     /**
      * Set the ORDER BY attribute to the SQL query.
      *
-     * @param string|null $table
+     * @param string|null $by
      * @return Select
      */
     public function orderBy(?string $by) : Select {
@@ -86,10 +71,10 @@ class Select extends Query{
      * Set the WHERE SQL parameter.
      *
      * @param string $where Set where example: "name = ?" or "name = ? AND last = ?".
-     * @param mixed $execute Set values example "Denzel" or ["Denzel", "Code"].
+     * @param array $execute Set values example "Denzel" or ["Denzel", "Code"].
      * @return Select
      */
-    public function where(string $where, $execute = []) : IQuery {
+    public function where(string $where, array $execute = []) : IQuery {
         return parent::where($where, $execute);
     }
 
@@ -118,7 +103,7 @@ class Select extends Query{
     /**
      * Select distinct value
      *
-     * @param string $column
+     * @param string|null $column
      * @return Select
      */
     public function distinct(string $column = null) : Select {
@@ -194,7 +179,7 @@ class Select extends Query{
     public function fetch() : array {
         $data = $this->execute()->fetch();
 
-        return $data == false ? [] : $data;
+        return !$data ? [] : $data;
     }
 
     /**
@@ -202,7 +187,7 @@ class Select extends Query{
      *
      * @return PDOStatement
      */
-    public function execute() {
+    public function execute(): PDOStatement {
         parent::execute();
 
         return $this->prepare;
@@ -213,7 +198,8 @@ class Select extends Query{
      *
      * @return bool
      */
-    public function executeBool() {
+    public function executeBool(): bool
+    {
         return parent::execute();
     }
 
@@ -223,19 +209,19 @@ class Select extends Query{
     * @return string
     */
     public function toQuery() : string {
-        $query = "SELECT " . (!empty($this->distinct) ? "DISTINCT {$this->distinct} " : "");
+        $query = "SELECT " . (!empty($this->distinct) ? "DISTINCT $this->distinct " : "");
 
         $query .= join(", ", $this->columns);
 
-        $query .= !empty($this->table) ? " FROM {$this->table}" : "";
+        $query .= !empty($this->table) ? " FROM $this->table" : "";
 
         foreach ($this->joins as $join) $query .= " " . $join->toQuery();
 
-        $query .= !empty($this->where) ? " WHERE {$this->where}" : "";
+        $query .= !empty($this->where) ? " WHERE $this->where" : "";
 
-        $query .= !empty($this->order) ? " ORDER BY {$this->order}" : "";
+        $query .= !empty($this->order) ? " ORDER BY $this->order" : "";
 
-        $query .= $this->limit > 0 ? " LIMIT {$this->limit}" : "";
+        $query .= $this->limit > 0 ? " LIMIT $this->limit" : "";
 
         return $query;
     }

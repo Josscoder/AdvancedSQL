@@ -1,63 +1,49 @@
 <?php
-/**
- * 
- * Advanced microFramework
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * 
- * @copyright Copyright (c) 2019 - 2020 Advanced microFramework
- * @author Advanced microFramework Team (Denzel Code, Soull Darknezz)
- * @link https://github.com/DenzelCode/Advanced
- * 
- */
 
-namespace advanced\sql;
+namespace AdvancedSQL;
 
-use advanced\sql\ISQL;
-use advanced\sql\query\AddColumns;
-use advanced\sql\query\Create;
-use advanced\sql\query\Delete;
-use advanced\sql\query\Drop;
-use advanced\sql\query\DropColumns;
-use advanced\sql\query\Insert;
-use advanced\sql\query\ModifyColumns;
-use advanced\sql\query\Query;
-use advanced\sql\query\Select;
-use advanced\sql\query\ShowColumns;
-use advanced\sql\query\Truncate;
-use advanced\sql\query\Update;
-use advanced\sql\table\ITable;
-use advanced\sql\table\Table;
+use AdvancedSQL\query\AddColumns;
+use AdvancedSQL\query\Create;
+use AdvancedSQL\query\Delete;
+use AdvancedSQL\query\Drop;
+use AdvancedSQL\query\DropColumns;
+use AdvancedSQL\query\Insert;
+use AdvancedSQL\query\ModifyColumns;
+use AdvancedSQL\query\Query;
+use AdvancedSQL\query\Select;
+use AdvancedSQL\query\ShowColumns;
+use AdvancedSQL\query\Truncate;
+use AdvancedSQL\query\Update;
+use AdvancedSQL\table\ITable;
+use AdvancedSQL\table\Table;
+use PDO;
 use PDOStatement;
 
 /**
  * SQL abstract class
  */
-abstract class SQL implements ISQL{
+abstract class SQL implements ISQL
+{
 
     /**
-     * @var PDO
+     * @var ?PDO
      */
-    protected $con;
+    protected ?PDO $connection = null;
 
     /**
      * @var boolean
      */
-    protected $connected = false;
+    protected bool $connected = false;
 
     /**
      * @var PDOStatement
      */
-    protected $lastStatement;
+    protected PDOStatement $lastStatement;
 
     /**
      * @return void
      */
-    abstract public function run() : void;
+    abstract public function run(): void;
 
     /**
      * Set the table to which you want to make a query.
@@ -65,7 +51,8 @@ abstract class SQL implements ISQL{
      * @param string $table
      * @return ITable
      */
-    public function table(string $table): ITable {
+    public function table(string $table): ITable
+    {
         return new Table($this, $table);
     }
 
@@ -74,8 +61,9 @@ abstract class SQL implements ISQL{
      *
      * @return boolean
      */
-    public function isConnected(): bool {
-       return $this->connected; 
+    public function isConnected(): bool
+    {
+        return $this->connected;
     }
 
     /**
@@ -85,7 +73,8 @@ abstract class SQL implements ISQL{
      * @param string|null $table
      * @return Select
      */
-    public function select(?string $table = null) : Select {
+    public function select(?string $table = null): Select
+    {
         return (new Select($this->table($table)));
     }
 
@@ -96,7 +85,8 @@ abstract class SQL implements ISQL{
      * @param string|null $table
      * @return Insert
      */
-    public function insert(?string $table = null) : Insert {
+    public function insert(?string $table = null): Insert
+    {
         return (new Insert($this->table($table)));
     }
 
@@ -107,7 +97,8 @@ abstract class SQL implements ISQL{
      * @param string|null $table
      * @return Update
      */
-    public function update(?string $table = null) : Update {
+    public function update(?string $table = null): Update
+    {
         return (new Update($this->table($table)));
     }
 
@@ -118,7 +109,8 @@ abstract class SQL implements ISQL{
      * @param string|null $table
      * @return Delete
      */
-    public function delete(?string $table = null) : Delete {
+    public function delete(?string $table = null): Delete
+    {
         return (new Delete($this->table($table)));
     }
 
@@ -129,10 +121,11 @@ abstract class SQL implements ISQL{
      * @param string|null $table
      * @return Create
      */
-    public function create(?string $table = null) : Create {
+    public function create(?string $table = null): Create
+    {
         return (new Create($this->table($table)));
     }
-    
+
     /**
      * Generate a drop query.
      * Recommendation: Use $sql->table("table")->drop(); instead.
@@ -140,7 +133,8 @@ abstract class SQL implements ISQL{
      * @param string|null $table
      * @return Drop
      */
-    public function drop(?string $table = null) : Drop {
+    public function drop(?string $table = null): Drop
+    {
         return (new Drop($this->table($table)));
     }
 
@@ -151,18 +145,20 @@ abstract class SQL implements ISQL{
      * @param string|null $table
      * @return ShowColumns
      */
-    public function showColumns(?string $table = null) : ShowColumns {
+    public function showColumns(?string $table = null): ShowColumns
+    {
         return (new ShowColumns($this->table($table)));
     }
 
     /**
-     * Generate a query to add columns into a table. 
+     * Generate a query to add columns into a table.
      * Recommendation: Use $sql->table("table")->addColumns(); instead.
      *
      * @param string|null $table
      * @return AddColumns
      */
-    public function addColumns(?string $table = null) : AddColumns {
+    public function addColumns(?string $table = null): AddColumns
+    {
         return (new AddColumns($this->table($table)));
     }
 
@@ -173,7 +169,8 @@ abstract class SQL implements ISQL{
      * @param string|null $table
      * @return ModifyColumns
      */
-    public function modifyColumns(?string $table = null) : ModifyColumns {
+    public function modifyColumns(?string $table = null): ModifyColumns
+    {
         return (new ModifyColumns($this->table($table)));
     }
 
@@ -184,7 +181,8 @@ abstract class SQL implements ISQL{
      * @param string|null $table
      * @return DropColumns
      */
-    public function dropColumns(?string $table = null) : DropColumns {
+    public function dropColumns(?string $table = null): DropColumns
+    {
         return (new DropColumns($this->table($table)));
     }
 
@@ -195,27 +193,30 @@ abstract class SQL implements ISQL{
      * @param string|null $table
      * @return Truncate
      */
-    public function truncate(?string $table = null) : Truncate {
+    public function truncate(?string $table = null): Truncate
+    {
         return (new Truncate($this->table($table)));
     }
 
     /**
      * Prepare the query.
-     * 
+     *
      * @param Query $query
      * @return PDOStatement
      */
-    public function prepare(Query $query) : PDOStatement {
-        return $this->con->prepare((string) $query);
+    public function prepare(Query $query): PDOStatement
+    {
+        return $this->connection->prepare((string)$query);
     }
 
     /**
-     * Set last statement. 
+     * Set last statement.
      *
      * @param PDOStatement $statement
      * @return void
      */
-    public function setLastStatement(PDOStatement $statement) : void {
+    public function setLastStatement(PDOStatement $statement): void
+    {
         $this->lastStatement = $statement;
     }
 
@@ -224,7 +225,8 @@ abstract class SQL implements ISQL{
      *
      * @return PDOStatement|null
      */
-    public function getLastStatement() : ?PDOStatement {
+    public function getLastStatement(): ?PDOStatement
+    {
         return $this->lastStatement;
     }
 
@@ -233,16 +235,18 @@ abstract class SQL implements ISQL{
      *
      * @return string
      */
-    public function getLastError() : string {
+    public function getLastError(): string
+    {
         return $this->getLastStatement()->errorInfo()[2];
     }
 
     /**
      * Get PDO object.
-     * 
-     * @return \PDO
+     *
+     * @return PDO
      */
-    public function getPDO() : \PDO {
-      return $this->con;
+    public function getPDO(): PDO
+    {
+        return $this->connection;
     }
 }

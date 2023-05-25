@@ -1,55 +1,41 @@
 <?php
-/**
- * 
- * Advanced microFramework
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * 
- * @copyright Copyright (c) 2019 - 2020 Advanced microFramework
- * @author Advanced microFramework Team (Denzel Code, Soull Darknezz)
- * @link https://github.com/DenzelCode/Advanced
- * 
- */
 
-namespace advanced\sql\query\join;
+namespace AdvancedSQL\query\join;
 
-use advanced\sql\query\IQuery;
-use advanced\sql\query\Select;
+use AdvancedSQL\query\IQuery;
+use AdvancedSQL\query\Select;
 use PDOStatement;
 
 /**
  * Join class
  */
-class Join implements IJoin {
+class Join implements IJoin
+{
 
     /**
      * @var Select
      */
-    protected $query;
+    protected Select $query;
 
     /**
      * @var string
      */
-    protected $table;
+    protected string $table;
 
     /**
      * @var string
      */
-    protected $on;
+    protected string $on;
 
     /**
      * @var string
      */
-    protected $as;
+    protected string $as;
 
     /**
      * @var array
      */
-    protected $using = [];
+    protected array $using = [];
 
     /**
      * Initialize join.
@@ -57,7 +43,8 @@ class Join implements IJoin {
      * @param Select $query
      * @param string $table
      */
-    public function __construct(Select $query, string $table) {
+    public function __construct(Select $query, string $table)
+    {
         $this->query = $query;
 
         $this->table = $table;
@@ -69,7 +56,8 @@ class Join implements IJoin {
      * @param string $conditional
      * @return Join
      */
-    public function on(string $conditional) : Join {
+    public function on(string $conditional): Join
+    {
         $this->on = $conditional;
 
         return $this;
@@ -81,7 +69,8 @@ class Join implements IJoin {
      * @param string $alias
      * @return Join
      */
-    public function as(string $alias) : Join {
+    public function as(string $alias): Join
+    {
         $this->as = $alias;
 
         return $this;
@@ -93,7 +82,8 @@ class Join implements IJoin {
      * @param array $columns
      * @return Join
      */
-    public function using(array $columns) : Join {
+    public function using(array $columns): Join
+    {
         $this->using = $columns;
 
         return $this;
@@ -105,7 +95,8 @@ class Join implements IJoin {
      * @param string $table
      * @return Join
      */
-    public function join(string $table) : IJoin {
+    public function join(string $table): IJoin
+    {
         return $this->query->join($table);
     }
 
@@ -115,7 +106,8 @@ class Join implements IJoin {
      * @param string $table
      * @return LeftJoin
      */
-    public function leftJoin(string $table) : IJoin {
+    public function leftJoin(string $table): IJoin
+    {
         return $this->query->leftJoin($table);
     }
 
@@ -125,7 +117,8 @@ class Join implements IJoin {
      * @param string $table
      * @return InnerJoin
      */
-    public function innerJoin(string $table) : IJoin {
+    public function innerJoin(string $table): IJoin
+    {
         return $this->query->innerJoin($table);
     }
 
@@ -135,7 +128,8 @@ class Join implements IJoin {
      * @param string $table
      * @return RightJoin
      */
-    public function rightJoin(string $table) : IJoin {
+    public function rightJoin(string $table): IJoin
+    {
         return $this->query->rightJoin($table);
     }
 
@@ -145,7 +139,8 @@ class Join implements IJoin {
      * @param string $table
      * @return FullJoin
      */
-    public function fullJoin(string $table) : IJoin {
+    public function fullJoin(string $table): IJoin
+    {
         return $this->query->fullJoin($table);
     }
 
@@ -156,33 +151,37 @@ class Join implements IJoin {
      * @param mixed $execute Set values example "Denzel" or ["Denzel", "Code"].
      * @return IQuery
      */
-    public function where(string $where, $execute = []) : IQuery {
+    public function where(string $where, $execute = []): IQuery
+    {
         return $this->query->where($where, $execute);
     }
 
     /**
      * Execute query and return PDOStatement.
-     * 
+     *
      * @return PDOStatement
      */
-    public function execute() : PDOStatement {
+    public function execute(): PDOStatement
+    {
         return $this->query->execute();
     }
 
     /**
      * @return string
      */
-    public function getPreffix(): string {
+    public function getPrefix(): string
+    {
         return "JOIN";
     }
 
     /**
-     * Convert Object to Query string. 
+     * Convert Object to Query string.
      *
      * @return string
      */
-    public function toQuery(): string {
-        $query = "{$this->getPreffix()} {$this->table}";
+    public function toQuery(): string
+    {
+        $query = "{$this->getPrefix()} $this->table";
 
         $query .= !empty($this->as) ? " AS ($this->as)" : "";
 

@@ -1,65 +1,52 @@
 <?php
-/**
- * 
- * Advanced microFramework
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * 
- * @copyright Copyright (c) 2019 - 2020 Advanced microFramework
- * @author Advanced microFramework Team (Denzel Code, Soull Darknezz)
- * @link https://github.com/DenzelCode/Advanced
- * 
- */
 
-namespace advanced\sql\query;
+namespace AdvancedSQL\query;
 
-use advanced\sql\ISQL;
-use advanced\sql\table\ITable;
+use AdvancedSQL\ISQL;
+use AdvancedSQL\table\ITable;
 use PDOStatement;
 
 /**
  * Query class
  */
-abstract class Query implements IQuery{
+abstract class Query implements IQuery
+{
 
     /**
-     * @var ISQL
+     * @var ?ISQL
      */
-    protected $sql = null;
+    protected ?ISQL $sql = null;
 
     /**
-     * @var ITable
+     * @var ?ITable
      */
-    protected $table = null;
+    protected ?ITable $table = null;
 
     /**
      * @var array
      */
-    protected $execute = [];
+    protected array $execute = [];
 
     /**
-     * @var PDOStatement
+     * @var ?PDOStatement
      */
-    protected $prepare = null;
+    protected ?PDOStatement $prepare = null;
 
     /**
-     * @var string
+     * @var ?string
      */
-    protected $where = null;
+    protected ?string $where = null;
 
     /**
-     * @var integer
+     * @var int
      */
-    protected $limit = 0;
+    protected int $limit = 0;
 
     /**
-     * @param ISQL $sql
+     * @param ITable|null $table
      */
-    public function __construct(ITable $table = null) {
+    public function __construct(ITable $table = null)
+    {
         $this->sql = $table->getSQL();
 
         $this->table = $table;
@@ -71,7 +58,8 @@ abstract class Query implements IQuery{
      * @param int $limit
      * @return IQuery
      */
-    public function setLimit(int $limit) : IQuery {
+    public function setLimit(int $limit): IQuery
+    {
         $this->limit = $limit;
 
         return $this;
@@ -83,16 +71,18 @@ abstract class Query implements IQuery{
      * @param int $limit
      * @return IQuery
      */
-    public function limit(int $limit) : IQuery {
+    public function limit(int $limit): IQuery
+    {
         return $this->setLimit($limit);
     }
 
     /**
      * Get the table that you want to modify.
      *
-     * @return ITable
+     * @return ITable|null
      */
-    public function getTable() : ?ITable {
+    public function getTable(): ?ITable
+    {
         return $this->table;
     }
 
@@ -100,10 +90,11 @@ abstract class Query implements IQuery{
      * Set the WHERE SQL parameter.
      *
      * @param string $where Set where example: "name = ?" or "name = ? AND last = ?".
-     * @param mixed $execute Set values example "Denzel" or ["Denzel", "Code"].
+     * @param array $execute Set values example "Denzel" or ["Denzel", "Code"].
      * @return IQuery
      */
-    public function where(string $where, $execute = []) : IQuery {
+    public function where(string $where, array $execute = []): IQuery
+    {
         $this->where = $where;
 
         if (is_array($execute)) $this->execute = $execute; else $this->execute[] = $execute;
@@ -116,7 +107,8 @@ abstract class Query implements IQuery{
      *
      * @return boolean
      */
-    public function execute() {
+    public function execute(): mixed
+    {
         $prepare = $this->sql->prepare($this);
 
         $this->sql->setLastStatement($prepare);
@@ -129,7 +121,8 @@ abstract class Query implements IQuery{
     /**
      * @return PDOStatement|null
      */
-    public function getPrepare() : ?PDOStatement {
+    public function getPrepare(): ?PDOStatement
+    {
         return $this->prepare;
     }
 
@@ -138,21 +131,23 @@ abstract class Query implements IQuery{
      *
      * @return string|null
      */
-    public function getError() : ?string {
+    public function getError(): ?string
+    {
         return $this->prepare = null || empty($this->prepare->errorInfo()[2]) ? null : $this->prepare->errorInfo()[2];
     }
 
     /**
-    * Generate the query string of the object.
-    *
-    * @return string
-    */
-    public abstract function toQuery() : string;
+     * Generate the query string of the object.
+     *
+     * @return string
+     */
+    public abstract function toQuery(): string;
 
     /**
      * @return string
      */
-    public function __toString() {
+    public function __toString()
+    {
         return $this->toQuery();
     }
 }

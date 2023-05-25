@@ -1,0 +1,25 @@
+{
+  "name": "denzelcode/advancedsql",
+  "description": "The best Java query builder/SQL connector",
+  "type": "library",
+  "require": {
+    "php": "^8.2",
+    "ext-pdo": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "AdvancedSQL\\": "/"
+    }
+  },
+  "authors": [
+    {
+      "name": "DenzelCode",
+      "email": "denzel@imwhile.com"
+    },
+    {
+      "name": "Josscoder",
+      "email": "josscoder@hotmail.com"
+    }
+  ],
+  "minimum-stability": "dev"
+}

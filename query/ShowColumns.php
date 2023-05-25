@@ -1,40 +1,27 @@
 <?php
-/**
- * 
- * Advanced microFramework
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * 
- * @copyright Copyright (c) 2019 - 2020 Advanced microFramework
- * @author Advanced microFramework Team (Denzel Code, Soull Darknezz)
- * @link https://github.com/DenzelCode/Advanced
- * 
- */
 
-namespace advanced\sql\query;
+namespace AdvancedSQL\query;
 
 use PDOStatement;
 
 /**
  * ShowColumns class
  */
-class ShowColumns extends Query{
+class ShowColumns extends Query
+{
 
     /**
      * @var string|null
      */
-    private $like = null;
+    private ?string $like = null;
 
     /**
      * Execute the Query and return an PDOStatement Object so you can fetch results.
      *
      * @return PDOStatement
      */
-    public function execute() {
+    public function execute(): PDOStatement
+    {
         parent::execute();
 
         return $this->prepare;
@@ -45,7 +32,8 @@ class ShowColumns extends Query{
      *
      * @return array
      */
-    public function fetchAll() : array {
+    public function fetchAll(): array
+    {
         return $this->execute()->fetchAll();
     }
 
@@ -54,7 +42,8 @@ class ShowColumns extends Query{
      *
      * @return array
      */
-    public function fetch() : array {
+    public function fetch(): array
+    {
         return ($this->execute()->fetch() ?? []);
     }
 
@@ -62,7 +51,8 @@ class ShowColumns extends Query{
      * @param string $like
      * @return ShowColumns
      */
-    public function like(string $like) : ShowColumns {
+    public function like(string $like): ShowColumns
+    {
         $this->like = $like;
 
         $this->execute[] = $like;
@@ -71,12 +61,13 @@ class ShowColumns extends Query{
     }
 
     /**
-    * Generate the query string of the object.
-    *
-    * @return string
-    */
-    public function toQuery() : string {
-        $query = "SHOW COLUMNS FROM {$this->table}";
+     * Generate the query string of the object.
+     *
+     * @return string
+     */
+    public function toQuery(): string
+    {
+        $query = "SHOW COLUMNS FROM $this->table";
 
         $query .= !empty($this->like) ? "LIKE ?" : "";
 

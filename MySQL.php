@@ -1,47 +1,30 @@
 <?php
-/**
- * 
- * Advanced microFramework
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * 
- * @copyright Copyright (c) 2019 - 2020 Advanced microFramework
- * @author Advanced microFramework Team (Denzel Code, Soull Darknezz)
- * @link https://github.com/DenzelCode/Advanced
- * 
- */
 
-namespace advanced\sql;
+namespace AdvancedSQL;
 
-use advanced\Bootstrap;
+use Exception;
 use PDO;
-use advanced\exceptions\DatabaseException;
-use advanced\config\Config;
-use advanced\data\Database;
+use PDOException;
 
 /**
  * MySQL class
  */
-class MySQL extends SQL{
+class MySQL extends SQL
+{
 
     /**
      * @var string
      */
-    private $host, $port, $username, $password, $database;
+    private string $database;
+    private string $password;
+    private string $username;
+    private string|int $port;
+    private string $host;
 
     /**
      * @var MySQL
      */
-    private static $instance;
-
-    /**
-     * @var string
-     */
-    private static $configPath = PROJECT . "resources" . DIRECTORY_SEPARATOR . "config" . DIRECTORY_SEPARATOR . "database";
+    private static MySQL $instance;
 
     /**
      * Initialize MySQL Connection.
@@ -51,18 +34,15 @@ class MySQL extends SQL{
      * @param string $username
      * @param string $password
      * @param string $database
-     * @param Database $db
+     * @throws Exception
      */
-    public function __construct(string $host = "127.0.0.1", int $port = 3306, string $username = "root", string $password = "", string $database = "testing", Database $db = null) {
+    public function __construct(string $host = "127.0.0.1", int $port = 3306, string $username = "root", string $password = "", string $database = "testing")
+    {
         if (!extension_loaded("pdo")) {
-            throw new DatabaseException(0, "exception.database.pdo_required");
-
-            return;
+            throw new Exception(0, "exception.database.pdo_required");
         }
 
         self::$instance = $this;
-        
-        if ($db != null) $this->con = $db->getPDO();
 
         $this->host = $host;
         $this->port = $port;
@@ -70,16 +50,18 @@ class MySQL extends SQL{
         $this->password = $password;
         $this->database = $database;
 
-        (new Config(self::$configPath, [ "import" => [], "update" => [] ]));
-        
         $this->run();
     }
 
     /**
      * @return void
+     * @throws Exception
      */
-    public function run() : void { 
-        if ($this->con) return;
+    public function run(): void
+    {
+        if (is_null($this->connection)) {
+            return;
+        }
 
         try {
             $options = [
@@ -88,101 +70,78 @@ class MySQL extends SQL{
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
             ];
 
-            $this->con = new PDO("mysql:host={$this->host};port={$this->port};dbname={$this->database};charset=utf8mb4", $this->username, $this->password);
-            
-            foreach ($options as $key => $value) $this->con->setAttribute($key, $value);
-            
+            $this->connection = new PDO("mysql:host=$this->host;port=$this->port;dbname=$this->database;charset=utf8mb4", $this->username, $this->password);
+
+            foreach ($options as $key => $value) $this->connection->setAttribute($key, $value);
+
             $this->connected = true;
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             if ($e->getCode() == 1049) {
                 try {
-                    $temp = new PDO("mysql:host={$this->host};port={$this->port};charset=utf8mb4", $this->username, $this->password);
-                    
-                    $temp->exec("CREATE DATABASE {$this->database}");
-                    
+                    $temp = new PDO("mysql:host=$this->host;port=$this->port;charset=utf8mb4", $this->username, $this->password);
+
+                    $temp->exec("CREATE DATABASE $this->database");
+
                     $temp = null;
-                } catch (\PDOException $ex) {
-                    throw new DatabaseException($ex->getCode(), "exception.database.connecting", $e->getMessage());
+                } catch (PDOException $ex) {
+                    throw new Exception($ex->getCode(), "exception.database.connecting", $e->getMessage());
                 }
-                
+
                 $this->run();
-                
+
                 return;
             }
-            
-            throw new DatabaseException($e->getCode(), "exception.database.connecting", $e->getMessage());
+
+            throw new Exception($e->getCode(), "exception.database.connecting", $e->getMessage());
         }
     }
 
     /**
      * @return MySQL
      */
-    public function getInstance() : MySQL {
+    public function getInstance(): MySQL
+    {
         return self::$instance;
-    }
-
-    /**
-     * Create a MySQL object from a Database connection object.
-     * 
-     * @param Database $database
-     * @return MySQL
-     */
-    public static function fromDatabase(Database $database) : MySQL {
-        return new MySQL($database->getHost(), $database->getPort(), $database->getUsername(), $database->getPassword(), $database->getDatabase(), $database);
     }
 
     /**
      * @return string
      */
-    public function getHost() : string {
+    public function getHost(): string
+    {
         return $this->host;
     }
 
     /**
      * @return integer
      */
-    public function getPort() : int {
+    public function getPort(): int
+    {
         return $this->port;
     }
 
     /**
      * @return string
      */
-    public function getUsername() : string {
+    public function getUsername(): string
+    {
         return $this->username;
     }
 
     /**
      * @return string
      */
-    public function getPassword() : string {
+    public function getPassword(): string
+    {
         return $this->password;
     }
 
     /**
      * @return string
      */
-    public function getDatabase() : string {
+    public function getDatabase(): string
+    {
         return $this->database;
-    }
-
-    /**
-     * Get config path.
-     * 
-     * @return string
-     */
-    public static function getConfigPath() : string {
-        return self::$configPath;
-    }
-
-    /**
-     * Set config path.
-     * 
-     * @param string $configPath
-     * @return void
-     */
-    public static function setConfigPath(string $configPath) : void {
-        self::$configPath = $configPath;
     }
 
     /**
@@ -190,13 +149,16 @@ class MySQL extends SQL{
      *
      * @param array $import
      * @return void
-     * @throws DatabaseException
+     * @throws Exception
      */
-    public function import(array $import) : void {
+    public function import(array $import): void
+    {
         foreach ($import as $table => $columns) {
             $table = $this->table($table);
 
-            if (!$table->exists() && !$table->create()->columns($columns)->execute()) throw new DatabaseException(1, "exception.database.create_table", $table, $this->getLastError());
+            if (!$table->exists() && !$table->create()->columns($columns)->execute()) {
+                throw new Exception(1, "exception.database.create_table", $this->getLastError());
+            }
         }
     }
 
@@ -205,40 +167,30 @@ class MySQL extends SQL{
      *
      * @param array $tables
      * @return void
-     * @throws DatabaseException
+     * @throws Exception
      */
-    public function modify(array $tables) : void {
-        foreach ($tables as $table => $columns) {
+    public function modify(array $tables): void
+    {
+        foreach ($tables as $table => $modifiedColumns) {
             $table = $this->table($table);
 
-            if (!$table->exists()) throw new DatabaseException(2, "exception.database.modify_column", $table, $this->getLastError());
-    
-            $colms = [];
-
-            foreach ($table->showColumns()->fetchAll() as $column) $colms[] = $colms["Field"];
-
-            foreach ($columns as $column => $type) {
-                $execute = in_array($column, $colms) ? $table->addColumns()->column($column, $type) : $table->modifyColumns()->column($column, $type);
-
-                if (!$execute) throw new DatabaseException(2, "exception.database.modify_column", $table->getName(), $this->getLastError());
+            if (!$table->exists()) {
+                throw new Exception(2, "exception.database.modify_column", $this->getLastError());
             }
-        }
-    }
 
-    /**
-     * Setup the tables to import and modify from a Config.
-     *
-     * @param Config $config
-     * @return void
-     * @throws DatabaseException
-     */
-    public function setup(Config $config) : void {
-        Bootstrap::getConfig()->setIfNotExists("database.setup", true)->saveIfModified();
+            $columns = [];
 
-        if (Bootstrap::getConfig()->get("database.setup", true)) {
-            $this->import($config->get("import", []));
+            foreach ($table->showColumns()->fetchAll() as $ignored) {
+                $columns[] = $columns["Field"];
+            }
 
-            $this->modify($config->get("modify", []));
+            foreach ($modifiedColumns as $column => $type) {
+                $execute = in_array($column, $columns) ? $table->addColumns()->column($column, $type) : $table->modifyColumns()->column($column, $type);
+
+                if (!$execute) {
+                    throw new Exception(2, "exception.database.modify_column", $this->getLastError());
+                }
+            }
         }
     }
 }
