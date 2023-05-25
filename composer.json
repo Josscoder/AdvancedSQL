@@ -1,6 +1,6 @@
 {
   "name": "denzelcode/advancedsql",
-  "description": "The best Java query builder/SQL connector",
+  "description": "The best PHP query builder/SQL connector",
   "type": "library",
   "require": {
     "php": "^8.2",
