@@ -65,20 +65,20 @@ class MySQL extends SQL
 
         try {
             $options = [
-                // PDO::ATTR_EMULATE_PREPARES => false,
-                // PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
             ];
 
-            $this->connection = new PDO("mysql:host=$this->host;port=$this->port;dbname=$this->database;charset=utf8mb4", $this->username, $this->password);
+            $this->connection = new PDO("mysql:host=$this->host;port=$this->port;dbname=$this->database", $this->username, $this->password);
 
-            foreach ($options as $key => $value) $this->connection->setAttribute($key, $value);
+            foreach ($options as $key => $value) {
+                $this->connection->setAttribute($key, $value);
+            }
 
             $this->connected = true;
         } catch (PDOException $e) {
             if ($e->getCode() == 1049) {
                 try {
-                    $temp = new PDO("mysql:host=$this->host;port=$this->port;charset=utf8mb4", $this->username, $this->password);
+                    $temp = new PDO("mysql:host=$this->host;port=$this->port", $this->username, $this->password);
 
                     $temp->exec("CREATE DATABASE $this->database");
 
@@ -181,7 +181,7 @@ class MySQL extends SQL
             $columns = [];
 
             foreach ($table->showColumns()->fetchAll() as $ignored) {
-                $columns[] = $columns["Field"];
+                $columns[] = $ignored["Field"];
             }
 
             foreach ($modifiedColumns as $column => $type) {

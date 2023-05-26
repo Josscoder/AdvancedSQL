@@ -92,11 +92,15 @@ class Insert extends Query
     {
         $query = "INSERT INTO $this->table (";
 
-        foreach ($this->fields as $i => $field) $query .= $i != (count($this->fields) - 1) ? "$field, " : $field;
+        foreach ($this->fields as $i => $field) {
+            $query .= $i != (count($this->fields) - 1) ? "$field, " : $field;
+        }
 
         $query .= ") VALUES (";
 
-        for ($i = 0; $i < count($this->values); $i++) $query .= $i != (count($this->values) - 1) ? "?, " : "?";
+        for ($i = 0; $i < count($this->values); $i++) {
+            $query .= $i != (count($this->values) - 1) ? "?, " : "?";
+        }
 
         $query .= ")";
 
